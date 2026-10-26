@@ -1,0 +1,15 @@
+# Службовий кеш байт-коду Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Віртуальні оточення
+.venv/
+venv/
+env/
+
+# Налаштування редакторів коду та ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
