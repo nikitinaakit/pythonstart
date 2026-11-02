@@ -28,8 +28,8 @@
 
 - **Проєкт:** Навчальний тренажер «PythonStart»
 - **Інструмент керування завданнями:** GitHub Issues та GitHub Projects.
-- **Посилання на Kanban-дошку:** [PythonStart – Team Board]https://github.com/users/nikitinaakit/projects/2
-- **Посилання на контрольний етап:** [Milestone MVP v1.0]https://github.com/nikitinaakit/pythonstart/milestone/1
+- **Посилання на Kanban-дошку:** [PythonStart – Team Board](https://github.com/users/nikitinaakit/projects/2)
+- **Посилання на контрольний етап:** [Milestone MVP v1.0](https://github.com/nikitinaakit/pythonstart/milestone/1)
 ### Kanban-статуси дошки:
 - **Backlog** – усі заплановані роботи та ідеї;
 - **To do** – відібрані завдання для найближчого виконання;
