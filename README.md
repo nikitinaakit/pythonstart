@@ -27,6 +27,8 @@
 Для запуску тренажера виконайте у терміналі команду:
 python src/main.py
  Детальна специфікація вимог (User Stories, Acceptance Criteria, MoSCoW та MVP): [docs/requirements.md](docs/requirements.md)
+ - **Специфікація інтерфейсу та прототип Penpot:** [docs/ui-ux-design.md](docs/ui-ux-design.md)
+ 
 ## 7. Організація командної роботи
 
 - **Проєкт:** Навчальний тренажер «PythonStart»
