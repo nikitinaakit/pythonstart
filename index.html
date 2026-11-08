@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PythonStart – Інтерактивний навчальний тренажер з основ Python</title>
+  <!-- Підключення єдиної точки входу стилів CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ======= ЗОНА УЧАСНИКА 1: ШАПКА ТА НАВІГАЦІЯ ======= -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#catalog" class="logo" aria-label="На головну PythonStart">
+        <span class="logo-badge">Py</span>
+        <span class="logo-text">PythonStart</span>
+      </a>
+      <nav class="main-nav" aria-label="Головна навігація">
+        <ul class="nav-list">
+          <li><a href="#catalog" class="nav-link active">Каталог тем</a></li>
+          <li><a href="#workspace" class="nav-link">Тренажер</a></li>
+          <li><a href="#about" class="nav-link">Про проєкт</a></li>
+        </ul>
+      </nav>
+      <div class="progress-pill" aria-live="polite">
+        Виконано тем: <strong id="progress-counter">1 / 3</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ ГОЛОВНИЙ ВМІСТ СТОРІНКИ ============= -->
+  <main class="main-content">
+
+    <!-- ===== ЗОНА УЧАСНИКА 2: БАНЕР ТА КАТАЛОГ ТЕМ ===== -->
+    <section class="hero-section">
+      <div class="container hero-inner">
+        <span class="hero-tag">Для учнів 8–9 класів • Безкоштовно</span>
+        <h1 class="hero-title">Вивчай основи Python легко та інтерактивно!</h1>
+        <p class="hero-subtitle">
+          Обирай навчальну тему з каталогу, читай коротке пояснення з прикладами та одразу перевіряй свої знання на практичних вправах у браузері.
+        </p>
+        <div class="hero-actions">
+          <a href="#catalog" class="btn btn-primary">Обрати тему для навчання</a>
+          <a href="#workspace" class="btn btn-secondary">Перейти до поточної вправи</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalog" class="catalog-section container" aria-labelledby="catalog-heading">
+      <div class="section-header">
+        <h2 id="catalog-heading" class="section-title">Каталог навчальних тем (MVP v1.0)</h2>
+        <p class="section-desc">Послідовно опануйте три базові модулі програмування мовою Python:</p>
+      </div>
+
+      <!-- Сітка карток тем (CSS Grid) -->
+      <div id="topics-grid" class="topics-grid">
+
+        <!-- Картка теми 1 -->
+        <article class="topic-card topic-card--active">
+          <div class="topic-card-top">
+            <span class="topic-step">Тема 1</span>
+            <span class="topic-status status-done">Опрацьовано</span>
+          </div>
+          <h3 class="topic-title">Змінні та базові типи даних</h3>
+          <p class="topic-summary">
+            Як зберігати числа та текст у пам’яті комп’ютера, правила іменування змінних і виведення через функцію <code>print()</code>.
+          </p>
+          <a href="#workspace" class="btn btn-outline topic-btn">Відкрити урок →</a>
+        </article>
+
+        <!-- Картка теми 2 -->
+        <article class="topic-card">
+          <div class="topic-card-top">
+            <span class="topic-step">Тема 2</span>
+            <span class="topic-status status-current">У процесі</span>
+          </div>
+          <h3 class="topic-title">Умовні оператори (if / else)</h3>
+          <p class="topic-summary">
+            Як навчити програму ухвалювати рішення залежно від умови, оператори порівняння <code>==</code>, <code>&gt;</code>, <code>&lt;</code>.
+          </p>
+          <a href="#workspace" class="btn btn-primary topic-btn">Розпочати тренування →</a>
+        </article>
+
+        <!-- Картка теми 3 -->
+        <article class="topic-card">
+          <div class="topic-card-top">
+            <span class="topic-step">Тема 3</span>
+            <span class="topic-status status-pending">Попереду</span>
+          </div>
+          <h3 class="topic-title">Цикли (for та while)</h3>
+          <p class="topic-summary">
+            Автоматизація повторюваних дій у програмі, використання функції діапазону <code>range()</code> для перебору чисел.
+          </p>
+          <a href="#workspace" class="btn btn-outline topic-btn">Відкрити урок →</a>
+        </article>
+
+      </div>
+    </section>
+
+<!-- ==== ЗОНА УЧАСНИКА 3: РОБОЧА ЗОНА УРОКУ ТА ВПРАВИ === -->
+    <section id="workspace" class="workspace-section container" aria-labelledby="lesson-heading">
+      <div class="workspace-grid">
+
+        <!-- Ліва колонка: Теоретична довідка -->
+        <article class="theory-panel">
+          <div class="panel-header">
+            <span class="badge-topic">Урок 1 • Теорія</span>
+            <h2 id="lesson-heading" class="panel-title">Виведення даних та змінні в Python</h2>
+          </div>
+          <div class="theory-content">
+            <p>
+              У мові програмування <strong>Python</strong> для виведення текстового повідомлення або значення змінної на екран використовується вбудована функція <code>print()</code>.
+            </p>
+            <p>Якщо ви хочете вивести звичайний текст (рядок), його обов’язково беруть у лапки:</p>
+            <pre class="code-block"><code># Приклад створення змінної та виведення на екран
+student_name = "Олександр"
+grade = 8
+print("Привіт,", student_name)
+print("Клас:", grade)</code></pre>
+            <div class="theory-tip">
+              <strong>💡 Зверніть увагу:</strong> Назва функції <code>print</code> завжди пишеться маленькими англійськими літерами, а після неї ставляться круглі дужки.
+            </div>
+          </div>
+        </article>
+
+        <!-- Права колонка: Інтерактивний тренажер (Вправа) -->
+        <article class="exercise-panel">
+          <div class="panel-header">
+            <span class="badge-exercise">Практична вправа № 1</span>
+            <h3 class="panel-title">Перевір свої знання</h3>
+          </div>
+
+          <p class="exercise-task" id="exercise-question">
+            <strong>Завдання:</strong> Яку вбудовану функцію мови Python потрібно написати, щоб вивести результат або повідомлення на екран? (Напишіть назву функції без дужок).
+          </p>
+
+          <form id="exercise-form" class="exercise-form" novalidate>
+            <div class="form-group">
+              <label for="user-answer" class="form-label">Ваша відповідь (команда Python):</label>
+              <input
+                type="text"
+                id="user-answer"
+                name="userAnswer"
+                class="form-input"
+                placeholder="Наприклад: input"
+                autocomplete="off"
+                required
+              >
+            </div>
+
+            <div class="exercise-actions">
+              <button type="submit" id="check-btn" class="btn btn-primary">Перевірити відповідь</button>
+              <button type="button" id="hint-btn" class="btn btn-secondary">Показати підказку</button>
+            </div>
+          </form>
+
+ <!-- ==== ЗОНА УЧАСНИКА 4: СТАНИ ЗВОРОТНОГО ЗВ'ЯЗКУ ==== -->
+          <div id="feedback-container" class="feedback-stack" aria-live="polite">
+            <!-- Демонстрація стану успішної відповіді -->
+            <div class="feedback-box feedback-success" role="status">
+              <strong>✅ Правильно! Чудова робота!</strong>
+              <p>Функція <code>print</code> дійсно відповідає за виведення даних у консоль. Можете переходити до наступної теми.</p>
+            </div>
+
+            <!-- Демонстрація стану помилки (для перевірки верстки згідно з макетом Penpot) -->
+            <div class="feedback-box feedback-error" role="alert">
+              <strong>❌ Ще не зовсім так. Спробуйте ще раз!</strong>
+              <p>Поле не може бути порожнім або містити іншу команду. Підказка: слово складається з 5 літер і перекладається як «друкувати».</p>
+            </div>
+          </div>
+
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====== ЗОНА УЧАСНИКА 1: ПІДВАЛ САЙТУ (FOOTER) ====== -->
+  <footer id="about" class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">
+        <strong>Навчальний тренажер «PythonStart» (MVP v1.0)</strong> – командний студентський проєкт з освітнього компонента «Командна розробка програмних проєктів».
+      </p>
+      <p class="footer-meta">КрНУ імені Михайла Остроградського • 2026 рік</p>
+    </div>
+  </footer>
+
+  <!-- Підключення клієнтського модуля JavaScript (з ЛР № 6) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

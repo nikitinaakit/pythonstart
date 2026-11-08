@@ -1,0 +1,5 @@
+/* Головний файл стилів тренажера PythonStart */
+@import url('./base.css');
+@import url('./catalog.css');
+@import url('./workspace.css');
+@import url('./components.css');
