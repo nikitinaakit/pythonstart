@@ -1,0 +1,221 @@
+/* =============================================================
+   css/components.css – Кнопки, Стани вправи (Успіх/Помилка), Доступність і @media
+   ======================================================== */
+
+/* Універсальні кнопки (відповідно до дизайн-системи з ЛР № 5) */
+.btn {
+  display: inline-block;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover {
+  background-color: #F1F5F9;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline:hover {
+  background-color: #EFF6FF;
+}
+
+/* Цифрова доступність: чітка рамка фокусу під час навігації клавішею Tab */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Стани зворотного зв'язку у вправі (Успіх / Помилка) */
+.feedback-stack {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feedback-box {
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.feedback-box p {
+  margin-top: 4px;
+}
+
+.feedback-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: var(--color-success-border);
+}
+
+.feedback-error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-color: var(--color-error-border);
+}
+
+/* ==========================================================
+   Адаптивний дизайн (Responsive Design) для планшетів і смартфонів (375px)
+   ======================================================== */
+
+@media (max-width: 900px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 20px;
+  }
+
+  .nav-list {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .hero-section {
+    padding: 36px 0;
+  }
+
+  .hero-title {
+    font-size: 1.65rem;
+  }
+
+  .hero-actions,
+  .exercise-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn,
+  .exercise-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .theory-panel,
+  .exercise-panel {
+    padding: 18px;
+  }
+}
+/* ===========================================================
+   Доповнення ЛР № 9: Стилі віджета зовнішнього REST API та станів завантаження
+   =========================================================== */
+
+.hidden {
+  display: none !important;
+}
+
+.api-section {
+  padding-top: 36px;
+  padding-bottom: 16px;
+}
+
+.api-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.api-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.api-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.api-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.api-badge--loading {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.api-badge--online {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.api-badge--fallback {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+.api-tip-body {
+  margin-top: 12px;
+}
+
+.api-tip-explanation {
+  margin-top: 10px;
+  color: var(--color-text);
+}
+
+.api-repo-footer {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
