@@ -1,5 +1,5 @@
 
-// data/topics.js – Модуль навчальних даних курсу Python
+// data/topics.js – Модуль навчальних даних курсу Python для учнів 8–9 класів
 
 export const topics = [
   {
