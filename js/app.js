@@ -131,8 +131,8 @@ function handleCheckAnswer(userInput) {
   } else {
     renderFeedback(
       "error",
-      t("exercise.incorrect"),
-      `Ви ввели «${userInput.trim()}». Зверніть увагу на приклад коду ліворуч або натисніть «Показати підказку».`
+      t(result.messageKey),
+      `Ви ввели «${userInput.trim()}». Перевірте свою відповідь і спробуйте ще раз.`
     );
   }
 }

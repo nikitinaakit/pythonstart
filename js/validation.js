@@ -1,11 +1,76 @@
-// js/validation.js – Модуль перевірки відповідей учня в інтерактивних вправах
-export function validateExerciseAnswer(userInput, expectedAnswer) {
-  // Очищуємо введення учня від випадкових пробілів на початку та в кінці (.trim())
-  const cleanedInput = String(userInput ?? "").trim();
-  const cleanedExpected = String(expectedAnswer ?? "").trim();
 
-  // Захист від порожнього поля (AC-5 із вимог ЛР №4)
-  if (cleanedInput.length === 0) {
+import { t } from "./i18n.js";
+
+// Нормалізація відповіді
+export function normalizeAnswer(value) {
+  return String(value ?? "").trim();
+}
+
+// Діагностика типових помилок учня
+export function diagnoseStudentMistake(rawUserInput, rawCorrectAnswer) {
+  const userStr = normalizeAnswer(rawUserInput);
+  const expectedStr = normalizeAnswer(rawCorrectAnswer);
+
+  if (!userStr || !expectedStr) {
+    return "exercise.incorrect";
+  }
+
+  // Учень ввів print(...) замість результату
+  if (
+    /^print\s*\(.*\)$/i.test(userStr) &&
+    !/^print\s*\(/i.test(expectedStr)
+  ) {
+    return "mistakeUsedPrint";
+  }
+
+  // Зайві лапки навколо відповіді
+  const withoutQuotes = userStr.replace(/^['"]|['"]$/g, "");
+
+  if (
+    withoutQuotes.toLowerCase() === expectedStr.toLowerCase() &&
+    withoutQuotes !== userStr
+  ) {
+    return "mistakeExtraQuotes";
+  }
+
+  // Числова різниця на одиницю
+  const userNum = Number(userStr);
+  const expectedNum = Number(expectedStr);
+
+  if (
+    userStr !== "" &&
+    expectedStr !== "" &&
+    !Number.isNaN(userNum) &&
+    !Number.isNaN(expectedNum) &&
+    Math.abs(userNum - expectedNum) === 1
+  ) {
+    return "mistakeOffByOne";
+  }
+
+  // Відмінність рівно в одному символі
+  if (userStr.length === expectedStr.length) {
+    let differences = 0;
+
+    for (let i = 0; i < userStr.length; i++) {
+      if (userStr[i] !== expectedStr[i]) {
+        differences++;
+      }
+    }
+
+    if (differences === 1) {
+      return "mistakeOffByOne";
+    }
+  }
+
+  return "exercise.incorrect";
+}
+
+// Основна функція перевірки відповіді
+export function validateExerciseAnswer(rawUserInput, rawCorrectAnswer) {
+  const userClean = normalizeAnswer(rawUserInput);
+  const correctClean = normalizeAnswer(rawCorrectAnswer);
+
+  if (!userClean) {
     return {
       status: "empty",
       isCorrect: false,
@@ -13,13 +78,23 @@ export function validateExerciseAnswer(userInput, expectedAnswer) {
     };
   }
 
-  // Порівняння нормалізованих відповідей (ігноруючи зайві пробіли навколо знака '=')
-  const normalizeCode = (str) => str.replace(/\s+/g, "").toLowerCase();
-  const isMatch = normalizeCode(cleanedInput) === normalizeCode(cleanedExpected);
+  const normalizeCode = (str) =>
+    str.replace(/\s+/g, "").toLowerCase();
+
+  const isMatch =
+    normalizeCode(userClean) === normalizeCode(correctClean);
+
+  if (isMatch) {
+    return {
+      status: "success",
+      isCorrect: true,
+      messageKey: "exercise.correct"
+    };
+  }
 
   return {
-    status: isMatch ? "success" : "error",
-    isCorrect: isMatch,
-    messageKey: isMatch ? "exercise.correct" : "exercise.incorrect"
+    status: "error",
+    isCorrect: false,
+    messageKey: diagnoseStudentMistake(userClean, correctClean)
   };
 }
