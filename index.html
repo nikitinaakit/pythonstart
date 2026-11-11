@@ -175,6 +175,47 @@ print("Клас:", grade)</code></pre>
       </div>
     </section>
 
+<!-- === ЗОНА ЛР № 9: ВІДЖЕТ ЗОВНІШНЬОГО REST API === -->
+<section id="api-explorer" class="api-section container" aria-labelledby="api-heading">
+  <div class="api-card">
+    <div class="api-card-header">
+      <div>
+        <span id="api-source-badge" class="api-badge api-badge--loading">⏳ Завантаження даних з API...</span>
+        <h2 id="api-heading" class="section-title">Скарбничка Python-розробника (REST API)</h2>
+      </div>
+      <div class="api-controls">
+        <button type="button" id="next-tip-btn" class="btn btn-primary">Інша порада з API ↻</button>
+        <button type="button" id="simulate-error-btn" class="btn btn-secondary" title="Перевірити поведінку інтерфейсу при помилці HTTP 404">
+          Тест помилки 404
+        </button>
+      </div>
+    </div>
+
+    <!-- Повідомлення про помилку мережі/сервера -->
+    <div id="api-error-banner" class="feedback-box feedback-error hidden" role="alert"></div>
+
+    <!-- Контейнер вмісту поради -->
+    <div id="api-tip-content" class="api-tip-body" aria-live="polite">
+      <span id="api-tip-category" class="badge-topic">Завантаження рубрики...</span>
+      <h3 id="api-tip-title" class="panel-title">Очікуємо відповідь від сервера...</h3>
+      <p id="api-tip-text" class="api-tip-explanation">
+        Зачекайте мить, виконується асинхронний HTTP-запит за допомогою функції fetch().
+      </p>
+      <pre class="code-block"><code id="api-tip-code"># Завантаження прикладу коду...</code></pre>
+    </div>
+
+    <!-- Статистика офіційного репозиторію Python -->
+    <div class="api-repo-footer">
+      <span id="api-repo-stats" class="api-repo-meta">
+        Синхронізація зі статистикою GitHub API (python/cpython)...
+      </span>
+      <a id="api-repo-link" href="https://github.com/python/cpython" target="_blank" rel="noopener noreferrer" class="nav-link">
+        Офіційний репозиторій Python ↗
+      </a>
+    </div>
+  </div>
+</section>
+
   </main>
 
   <!-- ====== ЗОНА УЧАСНИКА 1: ПІДВАЛ САЙТУ (FOOTER) ====== -->

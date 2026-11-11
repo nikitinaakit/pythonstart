@@ -136,3 +136,88 @@ input:focus-visible {
   }
 }
 
+/* ===========================================================
+   Доповнення ЛР № 9: Стилі віджета зовнішнього REST API та станів завантаження
+   =========================================================== */
+
+.hidden {
+  display: none !important;
+}
+
+.api-section {
+  padding-top: 36px;
+  padding-bottom: 16px;
+}
+
+.api-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.api-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.api-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.api-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.api-badge--loading {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.api-badge--online {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.api-badge--fallback {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+.api-tip-body {
+  margin-top: 12px;
+}
+
+.api-tip-explanation {
+  margin-top: 10px;
+  color: var(--color-text);
+}
+
+.api-repo-footer {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+
