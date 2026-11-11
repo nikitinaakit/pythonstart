@@ -2,6 +2,8 @@
 // ===========================================================
 // js/app.js – Головний модуль ініціалізації та координації тренажера PythonStart
 // ===========================================================
+import { initApiWidget } from "./apiWidget.js";
+
 
 import { getTopicsCatalog, getTopicById, renderTopicsCatalog } from "./topics.js";
 import { validateExerciseAnswer } from "./validation.js";
@@ -193,6 +195,10 @@ export function initApp() {
     onSubmitAnswer: handleCheckAnswer,
     onShowHint: handleShowHint
   });
+
+
+initApiWidget();
+
 
   bindResetShortcut();
   console.log("Навчальний тренажер PythonStart успішно ініціалізовано. Поточний прогрес:", appState);
