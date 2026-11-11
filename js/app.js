@@ -5,7 +5,12 @@
 import { initApiWidget } from "./apiWidget.js";
 
 
-import { getTopicsCatalog, getTopicById, renderTopicsCatalog } from "./topics.js";
+import {
+  getTopicsCatalog,
+  getTopicById,
+  renderTopicsCatalog,
+  setupCatalogFilters
+} from "./topics.js";
 import { validateExerciseAnswer } from "./validation.js";
 import { t } from "./i18n.js";
 import {
@@ -188,6 +193,15 @@ export function initApp() {
     onSelectTopic: handleSelectTopic
   });
 
+    // Підключаємо пошук та фільтрацію каталогу
+  setupCatalogFilters(() => {
+    renderTopicsCatalog({
+      activeTopicId: appState.activeTopicId,
+      completedTopics: appState.completedTopics,
+      onSelectTopic: handleSelectTopic
+    });
+  });
+  
   renderLessonWorkspace(initialTopic);
   clearFeedback();
 

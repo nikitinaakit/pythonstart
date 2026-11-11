@@ -53,6 +53,22 @@
         <p class="section-desc">Послідовно опануйте три базові модулі програмування мовою Python:</p>
       </div>
 
+<div class="catalog-controls" role="search" aria-label="Пошук та фільтрація навчальних тем">
+  <input
+    type="search"
+    id="topic-search-input"
+    class="catalog-search-input"
+    placeholder="Пошук теми (наприклад: цикли, списки)..."
+    aria-label="Пошук навчальної теми за назвою або описом"
+  />
+
+  <div class="catalog-filter-group" role="group" aria-label="Фільтр за статусом проходження">
+    <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">Усі</button>
+    <button type="button" class="filter-btn" data-filter="completed" aria-pressed="false">✓ Опрацьовані</button>
+    <button type="button" class="filter-btn" data-filter="pending" aria-pressed="false">Неопрацьовані</button>
+  </div>
+</div>
+
       <!-- Сітка карток тем (CSS Grid) -->
       <div id="topics-grid" class="topics-grid">
 

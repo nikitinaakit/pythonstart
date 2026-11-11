@@ -1,9 +1,14 @@
 
 // ===========================================================
-// js/topics.js – Модуль управління каталогом тем та генерації карток у DOM
+// js/topics.js – Модуль управління каталогом тем,
+// пошуку та фільтрації із захистом від XSS
 // ===========================================================
 
 import { topics } from "../data/topics.js";
+import { t } from "./i18n.js";
+
+let currentFilter = "all";
+let currentSearchQuery = "";
 
 /**
  * Повертає всі доступні навчальні теми
@@ -13,47 +18,118 @@ export function getTopicsCatalog() {
 }
 
 /**
- * Знаходить тему за її унікальним ідентифікатором (id)
+ * Знаходить тему за її унікальним ідентифікатором
  */
 export function getTopicById(topicId) {
   return topics.find((item) => item.id === topicId) ?? topics[0] ?? null;
 }
 
 /**
- * Динамічно створює картки навчальних тем у контейнері #topics-grid
- * @param {Object} options - Параметри відображення
- * @param {string} options.activeTopicId - ID поточної відкритої теми
- * @param {string[]} options.completedTopics - Масив ID пройдених тем із localStorage
- * @param {Function} options.onSelectTopic - Функція, яка викликається при кліку на тему
+ * Налаштування пошуку та кнопок фільтрації
  */
-export function renderTopicsCatalog({ activeTopicId, completedTopics = [], onSelectTopic }) {
+export function setupCatalogFilters(onFilterChange) {
+  const searchInput = document.getElementById("topic-search-input");
+  const filterButtons = document.querySelectorAll(".filter-btn");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (event) => {
+      currentSearchQuery = event.target.value.trim().toLowerCase();
+
+      if (typeof onFilterChange === "function") {
+        onFilterChange();
+      }
+    });
+  }
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentFilter = btn.dataset.filter || "all";
+
+      filterButtons.forEach((button) => {
+        const isActive = button === btn;
+
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      if (typeof onFilterChange === "function") {
+        onFilterChange();
+      }
+    });
+  });
+}
+
+/**
+ * Безпечне відображення карток із пошуком та фільтрацією
+ */
+export function renderTopicsCatalog({
+  activeTopicId,
+  completedTopics = [],
+  onSelectTopic
+}) {
   const gridContainer = document.querySelector("#topics-grid");
+
   if (!gridContainer) return;
 
-  // Очищуємо статичну розмітку перед малюванням актуальних карток
+  // Безпечне очищення контейнера
   gridContainer.replaceChildren();
 
   const allTopics = getTopicsCatalog();
 
   if (allTopics.length === 0) {
     const emptyMsg = document.createElement("p");
+    emptyMsg.className = "empty-catalog-msg";
     emptyMsg.textContent = "Навчальні теми тимчасово відсутні.";
     gridContainer.append(emptyMsg);
     return;
   }
 
-  allTopics.forEach((topic) => {
+  // Фільтрація за статусом і пошуковим запитом
+  const filteredTopics = allTopics.filter((topic) => {
+    const isCompleted = completedTopics.includes(topic.id);
+
+    const matchesStatus =
+      currentFilter === "all" ||
+      (currentFilter === "completed" && isCompleted) ||
+      (currentFilter === "pending" && !isCompleted);
+
+    const title = String(topic.title ?? "").toLowerCase();
+    const description = String(topic.description ?? "").toLowerCase();
+
+    const matchesQuery =
+      currentSearchQuery === "" ||
+      title.includes(currentSearchQuery) ||
+      description.includes(currentSearchQuery);
+
+    return matchesStatus && matchesQuery;
+  });
+
+  // Повідомлення, якщо нічого не знайдено
+  if (filteredTopics.length === 0) {
+    const noMatchMsg = document.createElement("p");
+    noMatchMsg.className = "empty-catalog-msg";
+
+    // textContent захищає від XSS-ін'єкцій
+    noMatchMsg.textContent = currentSearchQuery
+      ? `Нічого не знайдено для: «${currentSearchQuery}»`
+      : "За вибраним фільтром тем не знайдено.";
+
+    gridContainer.append(noMatchMsg);
+    return;
+  }
+
+  // Створення карток знайдених тем
+  filteredTopics.forEach((topic) => {
     const isCompleted = completedTopics.includes(topic.id);
     const isActive = topic.id === activeTopicId;
 
-    // 1. Створюємо кореневий семантичний тег картки <article>
     const card = document.createElement("article");
     card.className = "topic-card";
+
     if (isActive) {
       card.classList.add("topic-card--active");
     }
 
-    // 2. Верхній рядок картки (номер теми + бейдж статусу)
     const topBar = document.createElement("div");
     topBar.className = "topic-card-top";
 
@@ -63,6 +139,7 @@ export function renderTopicsCatalog({ activeTopicId, completedTopics = [], onSel
 
     const statusBadge = document.createElement("span");
     statusBadge.className = "topic-status";
+
     if (isCompleted) {
       statusBadge.classList.add("status-done");
       statusBadge.textContent = "✓ Опрацьовано";
@@ -76,7 +153,6 @@ export function renderTopicsCatalog({ activeTopicId, completedTopics = [], onSel
 
     topBar.append(stepSpan, statusBadge);
 
-    // 3. Заголовок та короткий опис теми (безпечно через textContent!)
     const titleEl = document.createElement("h3");
     titleEl.className = "topic-title";
     titleEl.textContent = topic.title;
@@ -85,22 +161,23 @@ export function renderTopicsCatalog({ activeTopicId, completedTopics = [], onSel
     summaryEl.className = "topic-summary";
     summaryEl.textContent = topic.description;
 
-    // 4. Інтерактивна кнопка вибору уроку
     const actionBtn = document.createElement("button");
     actionBtn.type = "button";
-    actionBtn.className = isActive ? "btn btn-primary topic-btn" : "btn btn-outline topic-btn";
+    actionBtn.className = isActive
+      ? "btn btn-primary topic-btn"
+      : "btn btn-outline topic-btn";
+
     actionBtn.textContent = isCompleted
       ? "Повторити урок →"
       : isActive
       ? "Поточний урок (відкрито)"
       : "Розпочати тренування →";
 
-    // Підключаємо слухач події кліку для перемикання теми
     actionBtn.addEventListener("click", () => {
       if (typeof onSelectTopic === "function") {
         onSelectTopic(topic.id);
       }
-      // Плавно прокручуємо екран до робочої зони вправи
+
       const workspaceSection = document.querySelector("#workspace");
       workspaceSection?.scrollIntoView({ behavior: "smooth" });
     });
