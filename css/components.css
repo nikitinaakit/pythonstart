@@ -134,6 +134,9 @@ input:focus-visible {
   .exercise-panel {
     padding: 18px;
   }
+
+}
+
 }
 
 /* ===========================================================
@@ -219,5 +222,4 @@ input:focus-visible {
   font-size: 0.9rem;
   color: var(--color-text-muted);
 }
-
 

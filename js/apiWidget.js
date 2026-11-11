@@ -140,4 +140,3 @@ export function initApiWidget() {
   // Виконуємо перше асинхронне завантаження одразу при старті сторінки
   refreshApiWidget({ simulateError: false });
 }
-

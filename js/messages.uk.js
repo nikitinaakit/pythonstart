@@ -22,4 +22,3 @@ export const messages = {
   "api.loading": "⏳ Завантаження даних із REST API...",
   "api.errorTitle": "⚠️ Зверніть увагу: основне джерело API тимчасово недоступне."
 };
-
