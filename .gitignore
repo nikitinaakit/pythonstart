@@ -13,3 +13,17 @@ env/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Службові папки Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Залежності Node.js та звіти тестування (ЛР № 11)
+node_modules/
+coverage/
+
+# Системні файли ОС
+.DS_Store
+Thumbs.db
