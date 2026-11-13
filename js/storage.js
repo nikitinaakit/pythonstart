@@ -78,7 +78,6 @@ export function saveActiveTopicId(topicId) {
   return current;
 }
 
-
 /**
  * Безпечно очищує лише ключ прогресу тренажера PythonStart у localStorage
  */
