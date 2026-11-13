@@ -78,13 +78,7 @@ export function saveActiveTopicId(topicId) {
   return current;
 }
 
-/**
- * Повністю очищує прогрес учня (для повторного проходження курсу)
- */
-export function resetProgress() {
-  localStorage.removeItem(STORAGE_KEY);
-  return getDefaultProgress();
-}
+
 /**
  * Безпечно очищує лише ключ прогресу тренажера PythonStart у localStorage
  */
