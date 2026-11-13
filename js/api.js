@@ -168,3 +168,78 @@ export async function loadPythonTipData({ simulateError = false } = {}) {
     };
   }
 }
+// Файл: js/app.js – Головна точка входу застосунку PythonStart (оновлено в ЛР № 10)
+import { topicsData } from '../data/topics.js';
+import { loadProgress, saveProgress, markTopicCompleted, resetProgress } from './storage.js';
+import { renderTopicsCatalog, setupCatalogFilters } from './topics.js';
+import { renderActiveWorkspace, bindWorkspaceEvents } from './workspace.js';
+import { initApiWidget } from './apiWidget.js';
+import { t } from './i18n.js';
+
+let currentState = loadProgress();
+
+function updateHeaderProgress() {
+  const counterEl = document.getElementById('progress-counter');
+  if (!counterEl) return;
+  const completedCount = currentState.completedTopics.length;
+  const totalCount = topicsData.length;
+  const score = currentState.totalScore || 0;
+  counterEl.textContent = `${completedCount} / ${totalCount} (${score} балів)`;
+}
+
+function handleSelectTopic(topicId) {
+  currentState.activeTopicId = topicId;
+  saveProgress(currentState);
+  refreshUI();
+}
+
+function handleTopicSuccess(topicId) {
+  currentState = markTopicCompleted(currentState, topicId, 10);
+  updateHeaderProgress();
+  refreshCatalogOnly();
+}
+
+function refreshCatalogOnly() {
+  renderTopicsCatalog(
+    topicsData,
+    currentState.completedTopics,
+    currentState.activeTopicId,
+    handleSelectTopic
+  );
+}
+
+function refreshUI() {
+  updateHeaderProgress();
+  refreshCatalogOnly();
+  const activeTopic = topicsData.find((item) => item.id === currentState.activeTopicId) || topicsData[0];
+  renderActiveWorkspace(
+    activeTopic,
+    currentState.completedTopics.includes(activeTopic.id)
+  );
+}
+
+function bindResetProgressButton() {
+  const resetBtn = document.getElementById('reset-progress-btn');
+  if (!resetBtn) return;
+
+  resetBtn.addEventListener('click', () => {
+    const confirmed = window.confirm(t('confirmResetProgress'));
+    if (!confirmed) return;
+
+    currentState = resetProgress();
+    refreshUI();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  refreshUI();
+  bindWorkspaceEvents(
+    () => topicsData.find((item) => item.id === currentState.activeTopicId) || topicsData[0],
+    handleTopicSuccess
+  );
+  setupCatalogFilters(() => {
+    refreshCatalogOnly();
+  });
+  bindResetProgressButton();
+  initApiWidget();
+});

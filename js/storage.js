@@ -85,3 +85,18 @@ export function resetProgress() {
   localStorage.removeItem(STORAGE_KEY);
   return getDefaultProgress();
 }
+/**
+ * Безпечно очищує лише ключ прогресу тренажера PythonStart у localStorage
+ */
+export function resetProgress() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.warn('Не вдалося очистити сховище localStorage:', error);
+  }
+  return {
+    completedTopics: [],
+    activeTopicId: 'variables',
+    totalScore: 0
+  };
+}
