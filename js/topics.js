@@ -7,6 +7,40 @@
 import { topics } from "../data/topics.js";
 import { t } from "./i18n.js";
 
+// Чиста функція пошуку та фільтрації навчальних тем
+export function filterTopicsData(
+  topics,
+  { filter = "all", searchQuery = "", completedTopics = [] } = {}
+) {
+  if (!Array.isArray(topics)) {
+    return [];
+  }
+
+  const cleanQuery =
+    typeof searchQuery === "string"
+      ? searchQuery.trim().toLowerCase()
+      : "";
+
+  return topics.filter((topic) => {
+    const isCompleted = completedTopics.includes(topic.id);
+
+    const matchesStatus =
+      filter === "all" ||
+      (filter === "completed" && isCompleted) ||
+      (filter === "pending" && !isCompleted);
+
+    const titleText = String(topic.title ?? "").toLowerCase();
+    const descText = String(topic.description ?? "").toLowerCase();
+
+    const matchesQuery =
+      cleanQuery === "" ||
+      titleText.includes(cleanQuery) ||
+      descText.includes(cleanQuery);
+
+    return matchesStatus && matchesQuery;
+  });
+}
+
 let currentFilter = "all";
 let currentSearchQuery = "";
 
@@ -84,24 +118,11 @@ export function renderTopicsCatalog({
     return;
   }
 
-  // Фільтрація за статусом і пошуковим запитом
-  const filteredTopics = allTopics.filter((topic) => {
-    const isCompleted = completedTopics.includes(topic.id);
-
-    const matchesStatus =
-      currentFilter === "all" ||
-      (currentFilter === "completed" && isCompleted) ||
-      (currentFilter === "pending" && !isCompleted);
-
-    const title = String(topic.title ?? "").toLowerCase();
-    const description = String(topic.description ?? "").toLowerCase();
-
-    const matchesQuery =
-      currentSearchQuery === "" ||
-      title.includes(currentSearchQuery) ||
-      description.includes(currentSearchQuery);
-
-    return matchesStatus && matchesQuery;
+  // Використання чистої функції фільтрації
+  const filteredTopics = filterTopicsData(allTopics, {
+    filter: currentFilter,
+    searchQuery: currentSearchQuery,
+    completedTopics
   });
 
   // Повідомлення, якщо нічого не знайдено
