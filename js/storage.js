@@ -100,3 +100,64 @@ export function resetProgress() {
     totalScore: 0
   };
 }
+// Файл: js/storage.js – Модуль збереження прогресу в localStorage
+export const STORAGE_KEY = 'pythonstart_progress_v1';
+
+const DEFAULT_STATE = {
+  completedTopics: [],
+  activeTopicId: 'variables',
+  totalScore: 0
+};
+
+export function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_STATE, completedTopics: [] };
+    const parsed = JSON.parse(raw);
+    return {
+      completedTopics: Array.isArray(parsed.completedTopics) ? parsed.completedTopics : [],
+      activeTopicId: typeof parsed.activeTopicId === 'string' ? parsed.activeTopicId : 'variables',
+      totalScore: typeof parsed.totalScore === 'number' ? parsed.totalScore : 0
+    };
+  } catch (error) {
+    return { ...DEFAULT_STATE, completedTopics: [] };
+  }
+}
+
+export function saveProgress(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn('Помилка запису в localStorage:', error);
+  }
+}
+
+export function markTopicCompleted(currentState, topicId, points = 10) {
+  const completed = Array.isArray(currentState.completedTopics)
+    ? [...currentState.completedTopics]
+    : [];
+  let score = typeof currentState.totalScore === 'number' ? currentState.totalScore : 0;
+
+  if (!completed.includes(topicId)) {
+    completed.push(topicId);
+    score += points;
+  }
+
+  const updatedState = {
+    ...currentState,
+    completedTopics: completed,
+    totalScore: score
+  };
+  saveProgress(updatedState);
+  return updatedState;
+}
+
+export function resetProgress() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.warn('Не вдалося очистити сховище localStorage:', error);
+  }
+  return { ...DEFAULT_STATE, completedTopics: [] };
+}
+
