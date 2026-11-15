@@ -1,61 +1,71 @@
+
 // ===========================================================
-// js/storage.js – Модуль роботи з клієнтським сховищем браузера localStorage
+// js/storage.js – Модуль роботи з клієнтським сховищем
 // ===========================================================
 
-const STORAGE_KEY = "pythonstart_progress_v1";
+export const STORAGE_KEY = "pythonstart_progress_v1";
 
-// Допоміжна функція початкового стану прогресу учня
+const DEFAULT_STATE = {
+  completedTopics: [],
+  activeTopicId: "variables",
+  totalScore: 0
+};
+
+// Повертає початковий стан прогресу
 function getDefaultProgress() {
   return {
-    completedTopics: [], // Масив ID успішно пройдених тем (наприклад: ["variables"])
-    activeTopicId: "variables", // Поточна вибрана тема
-    totalScore: 0 // Кількість зароблених балів
+    ...DEFAULT_STATE,
+    completedTopics: []
   };
 }
 
-/**
- * Безпечно зчитує збережений прогрес учня з localStorage
- */
+// Завантажує прогрес із localStorage
 export function loadProgress() {
   try {
     const rawData = localStorage.getItem(STORAGE_KEY);
+
     if (!rawData) {
       return getDefaultProgress();
     }
 
     const parsed = JSON.parse(rawData);
 
-    // Перевіряємо, чи має об'єкт очікувану структуру масиву
-    if (!parsed || !Array.isArray(parsed.completedTopics)) {
+    if (!parsed || typeof parsed !== "object") {
       return getDefaultProgress();
     }
 
     return {
-      completedTopics: parsed.completedTopics,
-      activeTopicId: parsed.activeTopicId || "variables",
-      totalScore: Number(parsed.totalScore) || 0
+      completedTopics: Array.isArray(parsed.completedTopics)
+        ? parsed.completedTopics
+        : [],
+      activeTopicId:
+        typeof parsed.activeTopicId === "string"
+          ? parsed.activeTopicId
+          : "variables",
+      totalScore:
+        typeof parsed.totalScore === "number"
+          ? parsed.totalScore
+          : 0
     };
   } catch (error) {
-    console.error("Помилка читання localStorage, застосовано початковий стан:", error);
+    console.error("Помилка читання localStorage:", error);
     return getDefaultProgress();
   }
 }
 
-/**
- * Зберігає поточний об'єкт прогресу у localStorage у форматі JSON
- */
+// Зберігає прогрес
 export function saveProgress(progressState) {
   try {
-    const serialized = JSON.stringify(progressState);
-    localStorage.setItem(STORAGE_KEY, serialized);
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(progressState)
+    );
   } catch (error) {
-    console.error("Не вдалося зберегти прогрес у localStorage:", error);
+    console.warn("Не вдалося зберегти прогрес:", error);
   }
 }
 
-/**
- * Позначає тему як успішно виконану та оновлює бали у сховищі
- */
+// Позначає тему як виконану
 export function markTopicAsCompleted(topicId) {
   const current = loadProgress();
 
@@ -68,9 +78,32 @@ export function markTopicAsCompleted(topicId) {
   return current;
 }
 
-/**
- * Зберігає ID теми, яку учень зараз відкрив для вивчення
- */
+// Альтернативний варіант функції для сумісності з app.js
+export function markTopicCompleted(currentState, topicId, points = 10) {
+  const completed = Array.isArray(currentState.completedTopics)
+    ? [...currentState.completedTopics]
+    : [];
+
+  let score = typeof currentState.totalScore === "number"
+    ? currentState.totalScore
+    : 0;
+
+  if (!completed.includes(topicId)) {
+    completed.push(topicId);
+    score += points;
+  }
+
+  const updatedState = {
+    ...currentState,
+    completedTopics: completed,
+    totalScore: score
+  };
+
+  saveProgress(updatedState);
+  return updatedState;
+}
+
+// Зберігає активну тему
 export function saveActiveTopicId(topicId) {
   const current = loadProgress();
   current.activeTopicId = topicId;
@@ -78,18 +111,13 @@ export function saveActiveTopicId(topicId) {
   return current;
 }
 
-/**
- * Безпечно очищує лише ключ прогресу тренажера PythonStart у localStorage
- */
+// Очищає тільки прогрес PythonStart
 export function resetProgress() {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.warn('Не вдалося очистити сховище localStorage:', error);
+    console.warn("Не вдалося очистити localStorage:", error);
   }
-  return {
-    completedTopics: [],
-    activeTopicId: 'variables',
-    totalScore: 0
-  };
+
+  return getDefaultProgress();
 }
