@@ -27,3 +27,4 @@ export const topics = [
     correctAnswer: "range(5)"
   }
 ];
+export const topicsData = topics;

@@ -1,8 +1,5 @@
 
-// ===========================================================
-// js/topics.js – Модуль управління каталогом тем,
-// пошуку та фільтрації із захистом від XSS
-// ===========================================================
+// js/topics.js – модуль каталогу, пошуку та фільтрації навчальних тем
 
 import { topics } from "../data/topics.js";
 import { t } from "./i18n.js";
@@ -11,21 +8,66 @@ let currentFilter = "all";
 let currentSearchQuery = "";
 
 /**
- * Повертає всі доступні навчальні теми
+ * Пошук та фільтрація навчальних тем.
+ * Використовується також у модульних тестах Vitest.
+ *
+ * @param {Array} topicsData - масив навчальних тем
+ * @param {Object} options - параметри пошуку та фільтрації
+ * @returns {Array} відфільтрований масив тем
+ */
+export function filterTopicsData(
+  topicsData,
+  {
+    searchQuery = "",
+    filter = "all",
+    completedTopics = []
+  } = {}
+) {
+  if (!Array.isArray(topicsData)) return [];
+
+  const query = String(searchQuery).trim().toLowerCase();
+
+  return topicsData.filter((topic) => {
+    const isCompleted = completedTopics.includes(topic.id);
+
+    const matchesStatus =
+      filter === "all" ||
+      (filter === "completed" && isCompleted) ||
+      (filter === "pending" && !isCompleted);
+
+    const title = String(topic.title ?? "").toLowerCase();
+    const description = String(topic.description ?? "").toLowerCase();
+
+    const matchesQuery =
+      query === "" ||
+      title.includes(query) ||
+      description.includes(query);
+
+    return matchesStatus && matchesQuery;
+  });
+}
+
+/**
+ * Повертає масив усіх навчальних тем.
  */
 export function getTopicsCatalog() {
   return Array.isArray(topics) ? topics : [];
 }
 
 /**
- * Знаходить тему за її унікальним ідентифікатором
+ * Знаходить навчальну тему за її ID.
+ *
+ * @param {string} topicId - ідентифікатор теми
+ * @returns {Object|null} знайдена тема
  */
 export function getTopicById(topicId) {
   return topics.find((item) => item.id === topicId) ?? topics[0] ?? null;
 }
 
 /**
- * Налаштування пошуку та кнопок фільтрації
+ * Налаштовує пошук та кнопки фільтрації каталогу.
+ *
+ * @param {Function} onFilterChange - функція оновлення каталогу
  */
 export function setupCatalogFilters(onFilterChange) {
   const searchInput = document.getElementById("topic-search-input");
@@ -60,7 +102,9 @@ export function setupCatalogFilters(onFilterChange) {
 }
 
 /**
- * Безпечне відображення карток із пошуком та фільтрацією
+ * Відображає картки навчальних тем у каталозі.
+ *
+ * @param {Object} options - параметри відображення
  */
 export function renderTopicsCatalog({
   activeTopicId,
@@ -71,118 +115,60 @@ export function renderTopicsCatalog({
 
   if (!gridContainer) return;
 
-  // Безпечне очищення контейнера
   gridContainer.replaceChildren();
 
   const allTopics = getTopicsCatalog();
 
   if (allTopics.length === 0) {
-    const emptyMsg = document.createElement("p");
-    emptyMsg.className = "empty-catalog-msg";
-    emptyMsg.textContent = "Навчальні теми тимчасово відсутні.";
-    gridContainer.append(emptyMsg);
+    const emptyMessage = document.createElement("p");
+    emptyMessage.textContent = t("catalog.empty");
+    gridContainer.appendChild(emptyMessage);
     return;
   }
 
-  // Фільтрація за статусом і пошуковим запитом
-  const filteredTopics = allTopics.filter((topic) => {
-    const isCompleted = completedTopics.includes(topic.id);
-
-    const matchesStatus =
-      currentFilter === "all" ||
-      (currentFilter === "completed" && isCompleted) ||
-      (currentFilter === "pending" && !isCompleted);
-
-    const title = String(topic.title ?? "").toLowerCase();
-    const description = String(topic.description ?? "").toLowerCase();
-
-    const matchesQuery =
-      currentSearchQuery === "" ||
-      title.includes(currentSearchQuery) ||
-      description.includes(currentSearchQuery);
-
-    return matchesStatus && matchesQuery;
+  const filteredTopics = filterTopicsData(allTopics, {
+    searchQuery: currentSearchQuery,
+    filter: currentFilter,
+    completedTopics
   });
 
-  // Повідомлення, якщо нічого не знайдено
   if (filteredTopics.length === 0) {
-    const noMatchMsg = document.createElement("p");
-    noMatchMsg.className = "empty-catalog-msg";
-
-    // textContent захищає від XSS-ін'єкцій
-    noMatchMsg.textContent = currentSearchQuery
-      ? `Нічого не знайдено для: «${currentSearchQuery}»`
-      : "За вибраним фільтром тем не знайдено.";
-
-    gridContainer.append(noMatchMsg);
+    const emptyMessage = document.createElement("p");
+    emptyMessage.textContent = t("catalog.noResults");
+    gridContainer.appendChild(emptyMessage);
     return;
   }
 
-  // Створення карток знайдених тем
   filteredTopics.forEach((topic) => {
     const isCompleted = completedTopics.includes(topic.id);
-    const isActive = topic.id === activeTopicId;
 
     const card = document.createElement("article");
     card.className = "topic-card";
 
-    if (isActive) {
-      card.classList.add("topic-card--active");
+    if (topic.id === activeTopicId) {
+      card.classList.add("active");
     }
 
-    const topBar = document.createElement("div");
-    topBar.className = "topic-card-top";
+    const title = document.createElement("h3");
+    title.textContent = topic.title ?? "";
 
-    const stepSpan = document.createElement("span");
-    stepSpan.className = "topic-step";
-    stepSpan.textContent = topic.stepLabel || "Тема";
+    const description = document.createElement("p");
+    description.textContent = topic.description ?? "";
 
-    const statusBadge = document.createElement("span");
-    statusBadge.className = "topic-status";
+    const status = document.createElement("span");
+    status.className = isCompleted ? "topic-status completed" : "topic-status pending";
+    status.textContent = isCompleted
+      ? t("catalog.completed")
+      : t("catalog.pending");
 
-    if (isCompleted) {
-      statusBadge.classList.add("status-done");
-      statusBadge.textContent = "✓ Опрацьовано";
-    } else if (isActive) {
-      statusBadge.classList.add("status-current");
-      statusBadge.textContent = "У процесі";
-    } else {
-      statusBadge.classList.add("status-pending");
-      statusBadge.textContent = "Попереду";
-    }
+    card.append(title, description, status);
 
-    topBar.append(stepSpan, statusBadge);
-
-    const titleEl = document.createElement("h3");
-    titleEl.className = "topic-title";
-    titleEl.textContent = topic.title;
-
-    const summaryEl = document.createElement("p");
-    summaryEl.className = "topic-summary";
-    summaryEl.textContent = topic.description;
-
-    const actionBtn = document.createElement("button");
-    actionBtn.type = "button";
-    actionBtn.className = isActive
-      ? "btn btn-primary topic-btn"
-      : "btn btn-outline topic-btn";
-
-    actionBtn.textContent = isCompleted
-      ? "Повторити урок →"
-      : isActive
-      ? "Поточний урок (відкрито)"
-      : "Розпочати тренування →";
-
-    actionBtn.addEventListener("click", () => {
+    card.addEventListener("click", () => {
       if (typeof onSelectTopic === "function") {
         onSelectTopic(topic.id);
       }
-
-      const workspaceSection = document.querySelector("#workspace");
-      workspaceSection?.scrollIntoView({ behavior: "smooth" });
     });
 
-    card.append(topBar, titleEl, summaryEl, actionBtn);
-    gridContainer.append(card);
+    gridContainer.appendChild(card);
   });
 }

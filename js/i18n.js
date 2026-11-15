@@ -3,7 +3,13 @@
 
 import { messages } from "./messages.uk.js";
 
+// Експорт словника для модульного тестування
+export const messagesUk = messages;
+
+/**
+ * Повертає переклад за ключем.
+ * Якщо переклад відсутній, повертає сам ключ.
+ */
 export function t(key) {
-    // Повертає ключ, якщо переклад не знайдено у словнику
-    return messages[key] ?? key;
+  return messagesUk[key] ?? key;
 }
