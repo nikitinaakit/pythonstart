@@ -1,100 +1,111 @@
 
-import { t } from "./i18n.js";
+import { messagesUk } from './messages.uk.js';
 
-// Нормалізація відповіді
-export function normalizeAnswer(value) {
-  return String(value ?? "").trim();
+/**
+ * Очищує рядок від HTML-тегів та небезпечних кутових дужок.
+ */
+export function sanitizeInput(rawInput) {
+  if (typeof rawInput !== 'string') {
+    return '';
+  }
+
+  return rawInput
+    .replace(/<[^>]*>/g, '')
+    .replace(/[<>]/g, '')
+    .trim();
 }
 
-// Діагностика типових помилок учня
-export function diagnoseStudentMistake(rawUserInput, rawCorrectAnswer) {
-  const userStr = normalizeAnswer(rawUserInput);
-  const expectedStr = normalizeAnswer(rawCorrectAnswer);
-
-  if (!userStr || !expectedStr) {
-    return "exercise.incorrect";
+/**
+ * Нормалізує відповідь: прибирає кінцеву крапку з комою
+ * та стискає зайві пробіли.
+ */
+export function normalizeAnswer(input) {
+  if (typeof input !== 'string') {
+    return '';
   }
 
-  // Учень ввів print(...) замість результату
+  return sanitizeInput(input)
+    .replace(/;+\s*$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Діагностує типові помилки учня.
+ */
+export function diagnoseStudentMistake(userInput, expectedAnswer) {
+  const raw = sanitizeInput(userInput);
+  const expected = normalizeAnswer(expectedAnswer);
+
+  if (!raw || !expected) return null;
+
+  const lowerRaw = raw.toLowerCase();
+  const lowerExpected = expected.toLowerCase();
+
   if (
-    /^print\s*\(.*\)$/i.test(userStr) &&
-    !/^print\s*\(/i.test(expectedStr)
+    lowerRaw === `print(${lowerExpected})` ||
+    lowerRaw === `print("${lowerExpected}")` ||
+    lowerRaw === `print('${lowerExpected}')`
   ) {
-    return "mistakeUsedPrint";
+    return messagesUk.mistakeUsedPrint;
   }
 
-  // Зайві лапки навколо відповіді
-  const withoutQuotes = userStr.replace(/^['"]|['"]$/g, "");
-
   if (
-    withoutQuotes.toLowerCase() === expectedStr.toLowerCase() &&
-    withoutQuotes !== userStr
+    lowerRaw === `"${lowerExpected}"` ||
+    lowerRaw === `'${lowerExpected}'`
   ) {
-    return "mistakeExtraQuotes";
+    return messagesUk.mistakeExtraQuotes;
   }
 
-  // Числова різниця на одиницю
-  const userNum = Number(userStr);
-  const expectedNum = Number(expectedStr);
+  const userNum = Number(raw);
+  const expectedNum = Number(expected);
 
   if (
-    userStr !== "" &&
-    expectedStr !== "" &&
     !Number.isNaN(userNum) &&
     !Number.isNaN(expectedNum) &&
     Math.abs(userNum - expectedNum) === 1
   ) {
-    return "mistakeOffByOne";
+    return messagesUk.mistakeOffByOne;
   }
 
-  // Відмінність рівно в одному символі
-  if (userStr.length === expectedStr.length) {
-    let differences = 0;
-
-    for (let i = 0; i < userStr.length; i++) {
-      if (userStr[i] !== expectedStr[i]) {
-        differences++;
-      }
-    }
-
-    if (differences === 1) {
-      return "mistakeOffByOne";
-    }
-  }
-
-  return "exercise.incorrect";
+  return null;
 }
 
-// Основна функція перевірки відповіді
-export function validateExerciseAnswer(rawUserInput, rawCorrectAnswer) {
-  const userClean = normalizeAnswer(rawUserInput);
-  const correctClean = normalizeAnswer(rawCorrectAnswer);
+/**
+ * Перевіряє відповідь учня.
+ */
+export function validateUserAnswer(userInput, expectedAnswer) {
+  const sanitizedValue = sanitizeInput(userInput);
+  const cleanUser = normalizeAnswer(sanitizedValue);
+  const cleanExpected = normalizeAnswer(expectedAnswer);
 
-  if (!userClean) {
+  if (cleanUser.length === 0) {
     return {
-      status: "empty",
-      isCorrect: false,
-      messageKey: "exercise.emptyWarning"
+      isValid: false,
+      status: 'empty',
+      message: messagesUk.emptyAnswer,
+      sanitizedValue
     };
   }
 
-  const normalizeCode = (str) =>
-    str.replace(/\s+/g, "").toLowerCase();
-
-  const isMatch =
-    normalizeCode(userClean) === normalizeCode(correctClean);
-
-  if (isMatch) {
+  if (cleanUser.toLowerCase() === cleanExpected.toLowerCase()) {
     return {
-      status: "success",
-      isCorrect: true,
-      messageKey: "exercise.correct"
+      isValid: true,
+      status: 'correct',
+      message: messagesUk.answerCorrect,
+      sanitizedValue
     };
   }
+
+  const diagnosticHint = diagnoseStudentMistake(
+    sanitizedValue,
+    expectedAnswer
+  );
 
   return {
-    status: "error",
-    isCorrect: false,
-    messageKey: diagnoseStudentMistake(userClean, correctClean)
+    isValid: false,
+    status: 'incorrect',
+    message: diagnosticHint || messagesUk.answerIncorrect,
+    sanitizedValue
   };
 }
