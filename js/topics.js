@@ -1,5 +1,5 @@
 
-// ===========================================================
+ // ===========================================================
 // js/topics.js – Модуль управління каталогом тем,
 // пошуку та фільтрації із захистом від XSS
 // ===========================================================
@@ -16,21 +16,34 @@ export function filterTopicsData(
     return [];
   }
 
+  const safeCompleted = Array.isArray(completedTopics)
+    ? completedTopics
+    : [];
+
   const cleanQuery =
     typeof searchQuery === "string"
-      ? searchQuery.trim().toLowerCase()
+      ? searchQuery.trim().replace(/\s+/g, " ").toLowerCase()
       : "";
 
   return topics.filter((topic) => {
-    const isCompleted = completedTopics.includes(topic.id);
+    if (!topic || typeof topic !== "object") return false;
+
+    const isCompleted = safeCompleted.includes(topic.id);
 
     const matchesStatus =
       filter === "all" ||
       (filter === "completed" && isCompleted) ||
       (filter === "pending" && !isCompleted);
 
-    const titleText = String(topic.title ?? "").toLowerCase();
-    const descText = String(topic.description ?? "").toLowerCase();
+    const titleText =
+      typeof topic.title === "string"
+        ? topic.title.replace(/\s+/g, " ").toLowerCase()
+        : "";
+
+    const descText =
+      typeof topic.description === "string"
+        ? topic.description.replace(/\s+/g, " ").toLowerCase()
+        : "";
 
     const matchesQuery =
       cleanQuery === "" ||
@@ -39,6 +52,34 @@ export function filterTopicsData(
 
     return matchesStatus && matchesQuery;
   });
+}
+
+/**
+ * Обчислює зведену статистику проходження каталогу тем
+ */
+export function getCatalogStats(topics, completedTopics = []) {
+  if (!Array.isArray(topics) || topics.length === 0) {
+    return { total: 0, completed: 0, remaining: 0, percent: 0 };
+  }
+
+  const safeCompleted = Array.isArray(completedTopics)
+    ? completedTopics
+    : [];
+
+  const completedCount = topics.filter(
+    (topic) => topic && safeCompleted.includes(topic.id)
+  ).length;
+
+  const total = topics.length;
+  const remaining = Math.max(0, total - completedCount);
+  const percent = Math.round((completedCount / total) * 100);
+
+  return {
+    total,
+    completed: completedCount,
+    remaining,
+    percent
+  };
 }
 
 let currentFilter = "all";
@@ -141,7 +182,10 @@ export function renderTopicsCatalog({
 
   // Створення карток знайдених тем
   filteredTopics.forEach((topic) => {
-    const isCompleted = completedTopics.includes(topic.id);
+    const isCompleted =
+      Array.isArray(completedTopics) &&
+      completedTopics.includes(topic.id);
+
     const isActive = topic.id === activeTopicId;
 
     const card = document.createElement("article");
