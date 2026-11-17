@@ -5,6 +5,8 @@
 
 export const STORAGE_KEY = "pythonstart_progress_v1";
 
+export const POINTS_PER_TOPIC = 10;
+
 const DEFAULT_STATE = {
   completedTopics: [],
   activeTopicId: "variables",
@@ -14,7 +16,16 @@ const DEFAULT_STATE = {
 function getDefaultProgress() {
   return { ...DEFAULT_STATE, completedTopics: [] };
 }
+// Очищення списку завершених тем
+function sanitizeTopicsList(rawList) {
+  if (!Array.isArray(rawList)) return [];
 
+  const cleaned = rawList
+    .filter((id) => typeof id === "string" && id.trim().length > 0)
+    .map((id) => id.trim());
+
+  return [...new Set(cleaned)];
+}
 // Завантаження прогресу
 export function loadProgress() {
   try {
@@ -24,14 +35,19 @@ export function loadProgress() {
 
     const parsed = JSON.parse(raw);
 
-    if (!parsed || !Array.isArray(parsed.completedTopics)) {
+    if (!parsed || typeof parsed !== "object") {
       return getDefaultProgress();
     }
 
+    const validCompleted = sanitizeTopicsList(parsed.completedTopics);
+
     return {
-      completedTopics: parsed.completedTopics,
-      activeTopicId: parsed.activeTopicId || "variables",
-      totalScore: Number(parsed.totalScore) || 0
+      completedTopics: validCompleted,
+      activeTopicId:
+        typeof parsed.activeTopicId === "string" && parsed.activeTopicId.trim().length > 0
+          ? parsed.activeTopicId.trim()
+          : "variables",
+      totalScore: validCompleted.length * POINTS_PER_TOPIC
     };
   } catch (error) {
     console.warn("Помилка читання localStorage:", error);
@@ -52,15 +68,20 @@ export function saveProgress(state) {
 export function markTopicAsCompleted(topicId) {
   const current = loadProgress();
 
-  if (!current.completedTopics.includes(topicId)) {
-    current.completedTopics.push(topicId);
-    current.totalScore = current.completedTopics.length * 10;
+  if (typeof topicId !== "string" || topicId.trim().length === 0) {
+    return current;
+  }
+
+  const cleanId = topicId.trim();
+
+  if (!current.completedTopics.includes(cleanId)) {
+    current.completedTopics.push(cleanId);
+    current.totalScore = current.completedTopics.length * POINTS_PER_TOPIC;
     saveProgress(current);
   }
 
   return current;
 }
-
 // Збереження активної теми (для app.js)
 export function saveActiveTopicId(topicId) {
   const current = loadProgress();
@@ -70,28 +91,37 @@ export function saveActiveTopicId(topicId) {
 }
 
 // Позначення теми як завершеної (для api.js)
-export function markTopicCompleted(currentState, topicId, points = 10) {
-  const completed = Array.isArray(currentState.completedTopics)
-    ? [...currentState.completedTopics]
-    : [];
+export function markTopicCompleted(currentState, topicId, points = POINTS_PER_TOPIC) {
+  const safeState =
+    currentState && typeof currentState === "object"
+      ? currentState
+      : DEFAULT_STATE;
 
-  let score = Number(currentState.totalScore) || 0;
+  const completed = sanitizeTopicsList(safeState.completedTopics);
 
-  if (!completed.includes(topicId)) {
-    completed.push(topicId);
-    score += points;
+  if (typeof topicId !== "string" || topicId.trim().length === 0) {
+    return {
+      ...safeState,
+      completedTopics: completed,
+      totalScore: completed.length * points
+    };
+  }
+
+  const cleanId = topicId.trim();
+
+  if (!completed.includes(cleanId)) {
+    completed.push(cleanId);
   }
 
   const updatedState = {
-    ...currentState,
+    ...safeState,
     completedTopics: completed,
-    totalScore: score
+    totalScore: completed.length * points
   };
 
   saveProgress(updatedState);
   return updatedState;
 }
-
 // Скидання прогресу
 export function resetProgress() {
   try {
