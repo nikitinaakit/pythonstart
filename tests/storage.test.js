@@ -2,6 +2,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   STORAGE_KEY,
+  POINTS_PER_TOPIC,
   loadProgress,
   markTopicCompleted,
   resetProgress
@@ -76,3 +77,28 @@ describe('Модуль js/storage.js – Керування навчальним
   });
 });
 
+  it('повинен ігнорувати порожні рядки, пробіли та null (BUG-04)', () => {
+    let state = loadProgress();
+
+    state = markTopicCompleted(state, '');
+    state = markTopicCompleted(state, '   ');
+    state = markTopicCompleted(state, null);
+
+    expect(state.completedTopics).toEqual([]);
+    expect(state.totalScore).toBe(0);
+  });
+
+  it('повинен очищувати дублікати та порожні значення під час завантаження (BUG-04)', () => {
+    globalThis.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedTopics: ['loops', '  loops ', '', null],
+        totalScore: 999
+      })
+    );
+
+    const loaded = loadProgress();
+
+    expect(loaded.completedTopics).toEqual(['loops']);
+    expect(loaded.totalScore).toBe(POINTS_PER_TOPIC);
+  });
