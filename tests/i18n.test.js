@@ -14,6 +14,17 @@ describe('Модуль js/i18n.js – Українська локалізаці�
   it('повинен повертати сам ключ як резервне значення, якщо переклад відсутній у словнику (Edge Case)', () => {
     expect(t('unknownMissingKey')).toBe('unknownMissingKey');
   });
+
+  it("CI-перевірка безпеки локалізації: жодне повідомлення словника не містить тегів <script>", () => {
+    const allValues = Object.values(messagesUk);
+
+    expect(allValues.length).toBeGreaterThanOrEqual(8);
+
+    allValues.forEach((msg) => {
+      expect(typeof msg).toBe("string");
+      expect(msg.toLowerCase().includes("<script>")).toBe(false);
+    });
+  });
 });
 
 describe('Контракт даних data/topics.js – Цілісність структури навчальних тем', () => {
