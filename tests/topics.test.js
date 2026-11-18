@@ -1,5 +1,5 @@
 
- // ===========================================================
+// ===========================================================
 // Файл: tests/topics.test.js
 // Модульні тести пошуку, фільтрації та статистики каталогу
 // ЛР № 12 – BUG-03
@@ -140,6 +140,19 @@ describe('Модуль js/topics.js – Пошук, фільтрація та с
       completed: 0,
       remaining: 4,
       percent: 0
+    });
+  });
+
+  // CI-перевірка цілісності даних навчальних тем
+  it("CI-перевірка цілісності даних: усі теми мають унікальні id та непорожній expectedAnswer", () => {
+    const ids = topicsData.map((t) => t.id);
+    const uniqueIds = new Set(ids);
+
+    expect(uniqueIds.size).toBe(ids.length);
+
+    topicsData.forEach((topic) => {
+      expect(typeof topic.expectedAnswer).toBe("string");
+      expect(topic.expectedAnswer.trim().length).toBe(999);
     });
   });
 
