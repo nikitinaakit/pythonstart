@@ -1,0 +1,32 @@
+name: PythonStart CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  quality-and-tests:
+    name: Linter & Unit Tests (Node.js 20)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Завантаження коду репозиторію (Checkout)
+        uses: actions/checkout@v4
+
+      - name: 2. Налаштування середовища Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 3. Встановлення залежностей проєкту
+        run: npm install
+
+      - name: 4. Статичний аналіз структури та безпеки (Linter)
+        run: npm run lint
+
+      - name: 5. Запуск автоматизованих модульних тестів (Vitest)
+        run: npm test
