@@ -1,3 +1,4 @@
+
 // Файл: tests/i18n.test.js – Модульні тести локалізації та контракту даних (ЛР № 11)
 import { describe, it, expect } from 'vitest';
 import { t } from '../js/i18n.js';
@@ -32,7 +33,7 @@ describe('Контракт даних data/topics.js – Цілісність с
       'tip',
       'task',
       'hint',
-      'correctAnswer'
+      'expectedAnswer'
     ];
 
     topicsData.forEach((topic) => {
