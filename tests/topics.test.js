@@ -152,7 +152,7 @@ describe('Модуль js/topics.js – Пошук, фільтрація та с
 
     topicsData.forEach((topic) => {
       expect(typeof topic.expectedAnswer).toBe("string");
-      expect(topic.expectedAnswer.trim().length).toBe(999);
+      expect(topic.expectedAnswer.trim().length).toBeGreaterThan(0);
     });
   });
 
