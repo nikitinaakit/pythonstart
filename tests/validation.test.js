@@ -81,3 +81,9 @@ describe('Модуль js/validation.js – Валідація відповід�
   });
 
 });
+  it("CI-регресія: коректно відхиляє надто довгий рядок без зависання та помилок", () => {
+    const longInput = "x = " + "1".repeat(500);
+    const result = validateUserAnswer(longInput, "15");
+    expect(result.isValid).toBe(false);
+    expect(result.status).toBe("error");
+  });
