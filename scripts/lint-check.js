@@ -17,6 +17,7 @@ const REQUIRED_FILES = [
   "js/storage.js",
   "docs/architecture.md",
   "docs/code-review-and-qa.md"
+  "js/non-existent-file.js"
 ];
 
 const JS_DIRS_TO_SCAN = ["data", "js", "tests"];
