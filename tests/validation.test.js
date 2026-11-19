@@ -85,5 +85,5 @@ describe('Модуль js/validation.js – Валідація відповід�
     const longInput = "x = " + "1".repeat(500);
     const result = validateUserAnswer(longInput, "15");
     expect(result.isValid).toBe(false);
-    expect(result.status).toBe("error");
+    expect(result.status).toBe("incorrect");
   });
