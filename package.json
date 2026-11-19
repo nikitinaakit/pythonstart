@@ -1,15 +1,15 @@
 {
-  "name": "pythonstart-trainer",
+  "name": "pythonstart",
   "version": "1.0.0",
-  "description": "Навчальний вебтренажер з основ Python для учнів 8-9 класів",
+  "description": "Інтерактивний навчальний вебтренажер з основ мови Python для учнів 8-9 класів ЗЗСО (Реліз MVP v1.0.0)",
   "type": "module",
   "scripts": {
-    "lint": "node scripts/lint-check.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "node scripts/lint-check.js",
     "ci:check": "npm run lint && npm test"
   },
   "devDependencies": {
-    "vitest": "^2.1.0"
+    "vitest": "^1.6.0"
   }
 }

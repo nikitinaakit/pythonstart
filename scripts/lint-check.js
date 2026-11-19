@@ -16,7 +16,8 @@ const REQUIRED_FILES = [
   "js/topics.js",
   "js/storage.js",
   "docs/architecture.md",
-  "docs/code-review-and-qa.md"
+  "docs/code-review-and-qa.md",
+  "docs/ci-cd-pipeline.md"
 ];
 
 const JS_DIRS_TO_SCAN = ["data", "js", "tests"];
@@ -61,7 +62,12 @@ for (const dir of JS_DIRS_TO_SCAN) {
     }
   }
 }
-
+const pkgRaw = fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf-8");
+const pkg = JSON.parse(pkgRaw);
+if (pkg.version !== "1.0.0") {
+  console.error(`[ПОМИЛКА РЕЛІЗУ] У package.json очікується версія "1.0.0", а знайдено: "${pkg.version}"`);
+  hasErrors = true;
+}
 if (hasErrors) {
   console.error("=== [PythonStart Linter] Перевірку ПРОВАЛЕНО (FAIL)! Виправте помилки вище. ===");
   process.exit(1);
@@ -69,3 +75,4 @@ if (hasErrors) {
   console.log("=== [PythonStart Linter] Усі перевірки структури та безпеки пройдено успішно (PASS)! ===");
   process.exit(0);
 }
+
